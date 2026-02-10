@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine? 💖</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: linear-gradient(135deg, #ff5f8a, #ff8fab);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  color: white;
+}
+
+.container {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(14px);
+  border-radius: 26px;
+  padding: 30px 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+h1 {
+  font-size: 1.7rem;
+  min-height: 60px;
+}
+
+.buttons {
+  position: relative;
+  height: 150px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 14px 30px;
+  border-radius: 30px;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.35s ease;
+  position: absolute;
+}
+
+#yesBtn {
+  background: #ff2f6e;
+  color: white;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#noBtn {
+  background: white;
+  color: #ff2f6e;
+  right: 15%;
+}
+
+.message {
+  margin-top: 20px;
+  min-height: 30px;
+  font-size: 1.1rem;
+}
+
+.result {
+  display: none;
+}
+
+.result img {
+  width: 100%;
+  border-radius: 18px;
+  margin-top: 15px;
+}
+
+.heart {
+  position: absolute;
+  bottom: -20px;
+  font-size: 22px;
+  animation: float 6s linear infinite;
+}
+
+@keyframes float {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100vh); opacity: 0; }
+}
+
+/* Emoji reaction */
+.reaction {
+  position: fixed;
+  font-size: 30px;
+  animation: pop 1.5s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes pop {
+  0% { transform: scale(0) translateY(0); opacity: 1; }
+  100% { transform: scale(1.6) translateY(-80px); opacity: 0; }
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+  <h1 id="typingText"></h1>
+
+  <div class="buttons">
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 💔</button>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <div class="result" id="result">
+    <h2>Thank you for accepting me 💕</h2>
+    <p>You are my forever Valentine 💫</p>
+    <img src="your-photo.jpeg">
+  </div>
+</div>
+
+<script>
+/* 🎵 Music (mobile-safe) */
+const music = document.getElementById("bgMusic");
+document.body.addEventListener("click", () => {
+  music.play();
+}, { once: true });
+
+/* ✍️ Typing animation */
+const text = "Prakriti, Will You Be My Valentine? 💘";
+let index = 0;
+const typingEl = document.getElementById("typingText");
+
+function typeText() {
+  if (index < text.length) {
+    typingEl.textContent += text.charAt(index);
+    index++;
+    setTimeout(typeText, 80);
+  }
+}
+typeText();
+
+/* Buttons logic */
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const message = document.getElementById("message");
+const result = document.getElementById("result");
+
+const messages = [
+  "Think again 😢",
+  "Pleaseee 🥺",
+  "I’ll cry 💔",
+  "Don’t break my heart 😭",
+  "Last chance 😞"
+];
+
+let noScale = 1;
+let yesScale = 1;
+let msgIndex = 0;
+
+function moveNo() {
+  const x = Math.random() * 260 - 130;
+  const y = Math.random() * 160 - 80;
+
+  noScale -= 0.15;
+  yesScale += 0.15;
+
+  noBtn.style.transform = `translate(${x}px, ${y}px) scale(${noScale})`;
+  yesBtn.style.transform = `translateX(-50%) scale(${yesScale})`;
+
+  message.textContent = messages[msgIndex % messages.length];
+  msgIndex++;
+
+  if (noScale < 0.25) {
+    noBtn.style.display = "none";
+    message.textContent = "Only one choice left 😏💖";
+  }
+}
+
+noBtn.addEventListener("mouseover", moveNo);
+noBtn.addEventListener("click", moveNo);
+
+/* 🎉 YES click */
+yesBtn.addEventListener("click", () => {
+  document.querySelector(".buttons").style.display = "none";
+  message.style.display = "none";
+  result.style.display = "block";
+  launchConfetti();
+});
+
+/* 💖 Floating hearts */
+setInterval(() => {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.textContent = "💖";
+  heart.style.left = Math.random() * 100 + "vw";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 6000);
+}, 400);
+
+/* 🤗 😘 Emoji reaction on tap */
+document.addEventListener("click", (e) => {
+  const emoji = document.createElement("div");
+  emoji.className = "reaction";
+  emoji.textContent = Math.random() > 0.5 ? "🤗" : "😘";
+  emoji.style.left = e.clientX + "px";
+  emoji.style.top = e.clientY + "px";
+  document.body.appendChild(emoji);
+  setTimeout(() => emoji.remove(), 1500);
+});
+
+/* 🎊 Confetti */
+function launchConfetti() {
+  for (let i = 0; i < 120; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.style.left = Math.random() * 100 + "vw";
+    confetti.style.backgroundColor = `hsl(${Math.random()*360},100%,70%)`;
+    confetti.style.animationDuration = Math.random() * 2 + 2 + "s";
+    document.body.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 3000);
+  }
+}
+</script>
+
+</body>
+</html>
